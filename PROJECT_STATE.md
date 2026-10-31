@@ -114,3 +114,57 @@ the Git commit and data/run manifest.
 Do not begin final skill inference until pre-trade
 market probability and information cutoff are valid.
 <!-- PILOT_COVERAGE_END -->
+
+
+<!-- OFFICIAL_API_AUDIT_START -->
+## Official API Feasibility Audit
+
+- Git commit: 8b0b52a368e11d8cffe5b0b06823a8869400001f
+- Endpoint: Data API v2 /trades
+- Historical market scope: fixed three-year window.
+- Market queries ignore start/end filters.
+- taker_only=false includes both wallet-side records.
+- Markets tested: 12
+- Markets reaching pilot date: 8
+- Pages fetched: 41
+- API rows: 40369
+- Request attempts: 41
+- Retries: 0
+- Final historical data source decision: PENDING.
+- Detailed results: data/audit/official_api_feasibility.json
+<!-- OFFICIAL_API_AUDIT_END -->
+
+## Phase 2 — Full History Optimized Extraction
+
+Decision:
+- Full UTC window: 2025-01-01 to 2026-03-31.
+- Source: TimeSeventeen/Polymarket-v1 cleaned trade layers.
+- Include daily_aligned and daily_aligned_multi.
+- No day sampling and no wallet profitability selection.
+- Extraction is split internally into daily partitions.
+- Preserve all source-cleaned fills in the selected window.
+
+Optimized storage:
+- Script: scripts/14_full_trade_extract.py
+- Trades: data/research_raw/trades/{market_type}/
+- Metadata: data/research_raw/market_metadata/{market_type}/
+- Market metadata is stored separately to reduce duplication.
+- Both maker and taker addresses remain available.
+- No premature wallet-market aggregation.
+
+Execution:
+- Mac VS Code is the only formal code editing environment.
+- GitHub is the authoritative code repository.
+- Colab Pro is the execution environment for large data.
+- Google Drive stores persistent Parquet and RUN_MANIFEST.json.
+- Git commit and Hugging Face revision are pinned.
+- Runs are resumable using the same commit.
+
+Outstanding research dependencies:
+- Obtain official historical market probabilities.
+- Reconstruct point-in-time market benchmarks.
+- Validate outcome-information cutoffs.
+- Validate wallet-side behavior and dataset filtering.
+- Identify related markets within shared events.
+- Avoid future outcome leakage in wallet features.
+- Forecasting Skill and BIA are not yet estimated.
