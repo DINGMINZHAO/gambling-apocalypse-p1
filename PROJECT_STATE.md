@@ -191,3 +191,27 @@ Next:
 - Validate information cutoffs before skill inference.
 - Move into Part I-A research as soon as valid
   market-adjusted observations are available.
+
+## Historical Probability Acquisition — 2026-10-31
+
+Priority: acquire independent official market probability
+history before further skill or BIA modeling.
+
+- Script: scripts/16_market_probabilities.py
+- Source: Polymarket Data API v2 /prices-history.
+- Unit: YES token per condition_id.
+- Frequency: historical 3-hour buckets.
+- available_ts = bucket_start + resolution_seconds.
+- Store only completed historical buckets.
+- Candidate priority: >=50 fills, >=6h observed activity.
+- Stratification: first active month and market type.
+- These are acquisition priorities, not final inference
+  sample eligibility criteria.
+- Short-duration and less-active markets remain in
+  the original transaction database.
+- Output: Drive/data/market_probabilities/.
+- Probability output budget: 1.5 GiB initially.
+- Resume tracking: PROBABILITY_RUN_MANIFEST.json.
+- Research-ready status: NOT YET.
+- Next: strict as-of matching to trade timestamps and
+  benchmark-age/coverage validation.
