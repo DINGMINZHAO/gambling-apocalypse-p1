@@ -168,3 +168,26 @@ Outstanding research dependencies:
 - Identify related markets within shared events.
 - Avoid future outcome leakage in wallet features.
 - Forecasting Skill and BIA are not yet estimated.
+
+## Full Historical Trade Extraction — Completed
+
+- Status: COMPLETE (2026-10-31)
+- Source Git commit: 824c80ae2d2df1c879845b9447a99580ba1e2080
+- Source dataset revision:
+  5aa1b9d52316a8b2e789e81c8ae42c7ed532e8aa
+- Period: 2025-01-01 to 2026-03-31 UTC
+- Completed partitions: 912 / 912
+- Missing partitions: 0
+- Failed partitions: 0
+- Extracted fills: 569,536,397
+- Persistent storage: 10.59 GB
+- Drive: gambling-apocalypse-p1/data/research_raw/
+- RUN_MANIFEST.json verified by extraction script.
+- Coverage refers to selected cleaned source layers.
+
+Next:
+- Build market and outcome-token registry.
+- Obtain historical market probabilities.
+- Validate information cutoffs before skill inference.
+- Move into Part I-A research as soon as valid
+  market-adjusted observations are available.
