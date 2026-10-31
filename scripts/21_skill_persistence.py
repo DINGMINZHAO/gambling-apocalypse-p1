@@ -406,6 +406,8 @@ def main():
     parser.add_argument(
         "--split-date", default="2025-10-01"
     )
+    parser.add_argument("--grace-days", type=int, default=7)
+    parser.add_argument("--evaluation-cutoff", default="2026-10-31")
     parser.add_argument(
         "--min-train", type=int, default=5
     )
@@ -431,6 +433,12 @@ def main():
         ).timestamp()
     )
 
+    evaluation_ts = int(datetime.strptime(
+        args.evaluation_cutoff, "%Y-%m-%d"
+    ).replace(tzinfo=timezone.utc).timestamp())
+    if args.grace_days < 0 or evaluation_ts <= split:
+        raise ValueError("Invalid evaluation date or grace days")
+
     data = Path(args.drive_root) / "data"
     aligned = data / "probability_alignment"
     registry = (
@@ -452,7 +460,7 @@ def main():
 
     out = (
         data / "research_results"
-        / "p1a_skill_persistence"
+        / f"p1a_skill_persistence_proxy_{args.grace_days}d"
     )
     figdir = out / "figures"
     figdir.mkdir(parents=True, exist_ok=True)
@@ -502,6 +510,7 @@ def main():
                     market_type,
                     condition_id,
                     neg_risk_market_id,
+                    EPOCH(close_at) AS close_ts,
                     CASE
                         WHEN TRY_CAST(
                             resolved_at AS DOUBLE
@@ -529,6 +538,11 @@ def main():
                 market_type,
                 condition_id,
                 MIN(resolved_ts) AS resolved_ts,
+                COALESCE(
+                    MIN(resolved_ts),
+                    MIN(close_ts) + {args.grace_days} * 86400
+                ) AS label_available_ts,
+                COUNT(DISTINCT close_ts) AS close_versions,
                 COUNT(DISTINCT resolved_ts)
                     AS resolution_versions,
                 ANY_VALUE(
@@ -586,6 +600,8 @@ def main():
                     ELSE a.p_market_before - a.y_yes
                 END AS score,
                 m.resolved_ts,
+                m.label_available_ts,
+                m.close_versions,
                 m.resolution_versions,
                 CASE
                     WHEN m.event_id IS NOT NULL
@@ -624,28 +640,34 @@ def main():
 
                 AVG(score) FILTER (
                     WHERE trade_ts < {split}
-                      AND resolved_ts <= {split}
-                      AND resolved_ts > trade_ts
-                      AND resolution_versions = 1
+                      AND label_available_ts <= {split}
+                      AND label_available_ts > trade_ts
+                      AND resolution_versions <= 1
+                      AND close_versions = 1
                 ) AS train_score,
 
                 COUNT(*) FILTER (
                     WHERE trade_ts < {split}
-                      AND resolved_ts <= {split}
-                      AND resolved_ts > trade_ts
-                      AND resolution_versions = 1
+                      AND label_available_ts <= {split}
+                      AND label_available_ts > trade_ts
+                      AND resolution_versions <= 1
+                      AND close_versions = 1
                 ) AS n_train_obs,
 
                 AVG(score) FILTER (
                     WHERE trade_ts >= {split}
-                      AND resolved_ts > trade_ts
-                      AND resolution_versions = 1
+                      AND label_available_ts <= {evaluation_ts}
+                      AND label_available_ts > trade_ts
+                      AND resolution_versions <= 1
+                      AND close_versions = 1
                 ) AS future_score,
 
                 COUNT(*) FILTER (
                     WHERE trade_ts >= {split}
-                      AND resolved_ts > trade_ts
-                      AND resolution_versions = 1
+                      AND label_available_ts <= {evaluation_ts}
+                      AND label_available_ts > trade_ts
+                      AND resolution_versions <= 1
+                      AND close_versions = 1
                 ) AS n_future_obs
 
             FROM obs
@@ -835,6 +857,9 @@ def main():
         report = {
             "git_commit": commit,
             "split_date_utc": args.split_date,
+            "evaluation_cutoff_utc": args.evaluation_cutoff,
+            "grace_days": args.grace_days,
+            "label_timing": "resolved_at or close_at + grace days",
             "min_train_markets": args.min_train,
             "min_future_markets": args.min_future,
             "registry_markets": metadata[0],
@@ -859,7 +884,8 @@ def main():
             "caveats": [
                 "Historical deciles use only pre-cutoff data.",
                 "Future participation is selected ex-post.",
-                "Training labels require resolved_at <= cutoff.",
+                "Missing resolved_at uses close_at + grace days.",
+                "Close-time proxy does not verify public outcome time.",
                 "resolved_at is not independently audited.",
                 "Future scores use newly sampled markets.",
                 "Clustering covers markets and known multi-events.",
