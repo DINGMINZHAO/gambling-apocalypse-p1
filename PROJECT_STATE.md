@@ -238,3 +238,255 @@ history before further skill or BIA modeling.
 - Pre-close cutoff is provisional, not a verified
   first-public-outcome timestamp.
 - No Forecasting Skill or BIA estimates yet.
+
+# PROJECT HANDOFF — 2026-10-31
+## Gambling Apocalypse — Part I
+
+### CURRENT STATUS
+Data acquisition, historical probability alignment,
+and unified 12-hour sample validation are COMPLETE.
+
+NEXT PHASE: Part I-A — Skill vs. Luck.
+Do NOT repeat completed extraction or alignment work.
+
+### 1. RESEARCH SCOPE
+
+Project positioning:
+Web3 Data Science / On-chain Behavioral Analytics.
+
+Research unit:
+Polymarket on-chain wallet address, NOT real identity.
+
+Part I:
+A. Skill vs. Luck
+B. Predicting Smart Money
+C. Specialists vs. Generalists
+
+Two parallel research dimensions:
+- Forecasting Skill: persistent market-adjusted
+  predictive ability.
+- Behavioral Information Alpha: incremental
+  out-of-sample information from wallet behavior
+  beyond the market benchmark.
+
+Predictable Fool is an important research idea:
+wallets with systematically negative forecasting
+skill may still provide useful inverted information.
+
+Part II (F/H) and Part III (D/E/I) are separate
+future projects. Do not expand Part I into them.
+
+### 2. COMPLETED HISTORICAL DATABASE
+
+Period: 2025-01-01 to 2026-03-31 UTC.
+Source: TimeSeventeen/Polymarket-v1.
+Layers: daily_aligned + daily_aligned_multi.
+Total fills: 569,536,397.
+Partitions: 912/912 complete.
+Raw data size: approximately 10.59 GB.
+
+Market registry:
+- Markets: 612,892
+- Outcome token records: 1,108,682
+- Multi-outcome event groups: 19,843
+
+Relevant scripts:
+- 14_full_trade_extract.py
+- 15_market_registry.py
+
+Drive:
+gambling-apocalypse-p1/data/research_raw/
+gambling-apocalypse-p1/data/research_index/
+
+Original source commit:
+824c80ae2d2df1c879845b9447a99580ba1e2080
+
+Original Hugging Face revision:
+5aa1b9d52316a8b2e789e81c8ae42c7ed532e8aa
+
+### 3. COMPLETED MARKET PROBABILITIES
+
+Script: scripts/16_market_probabilities.py
+
+Source:
+Polymarket official Data API v2 /prices-history.
+
+Candidate markets requested: 24,000
+Markets with usable history: 23,932
+Markets without qualifying history: 68
+Historical probability observations: 1,795,673
+API requests: 24,000
+
+Historical price frequency: 3-hour buckets.
+Timestamp rule:
+available_ts = bucket_start + resolution_seconds.
+
+Important:
+Probability coverage is restricted to prioritized
+markets, not the entire historical universe.
+
+Drive:
+data/market_probabilities/
+
+Manifest:
+PROBABILITY_RUN_MANIFEST.json
+
+### 4. COMPLETED PROBABILITY ALIGNMENT
+
+Script: scripts/17_probability_alignment.py
+
+Aligned period: all 15 months.
+Sampling unit:
+First taker BUY per wallet-market-month.
+
+Total wallet-market-month observations: 10,342,265
+Matched historical probability: 10,212,600
+Within 1 hour: 876,039
+Within 3 hours: 2,459,690
+
+Matching rule:
+Latest completed market probability bucket strictly
+before the observed trade timestamp.
+
+Output:
+data/probability_alignment/wallet_market_YYYY_MM.parquet
+
+All 15 monthly files completed.
+ALIGNMENT_MANIFEST.json exists.
+Process exited successfully.
+
+### 5. UNIFIED RESEARCH SAMPLE — DECIDED
+
+Script: scripts/18_sample_12h.py
+
+Main sample selection:
+- Historical market probability precedes trade.
+- Maximum probability age: 12 hours.
+- Valid binary market settlement label.
+- Trade at least 1 hour before recorded close_at.
+- First taker BUY per wallet-market-month,
+  following the current alignment dataset.
+
+Final results:
+Total observations: 10,342,265
+Matched probability: 10,212,600
+Within 12 hours: 9,928,254
+Valid under 3h rule: 1,777,424
+Valid under unified 12h rule: 7,143,340
+Distinct wallets: 1,169,132
+Distinct markets: 14,925
+
+Valid 12h / total observations: approximately 69.1%.
+
+Price freshness diagnostic:
+
+0-3h:
+  Observations: 1,777,424
+  Mean absolute execution/benchmark gap: 0.0244
+  Median absolute gap: 0.0050
+
+3-6h:
+  Observations: 1,858,039
+  Mean absolute gap: 0.0289
+  Median absolute gap: 0.0050
+
+6-12h:
+  Observations: 3,507,877
+  Mean absolute gap: 0.0340
+  Median absolute gap: 0.0059
+
+Decision:
+Use ONE unified 12-hour main sample.
+Do not repeatedly redesign sample filters.
+No elaborate three-tier sample framework required.
+
+Report:
+data/research_results/P1_SAMPLE_12H_REPORT.json
+
+### 6. IMPORTANT LIMITATIONS
+
+- 12-hour prices are proxies for earlier market beliefs.
+- close_at is not a verified result-publication time.
+- Markets were prioritized for probability acquisition;
+  the resulting sample is not the full market universe.
+- Multiple wallets can trade the same market.
+  Observations are not statistically independent.
+- First BUY per wallet-market-month is an initial
+  representation, not a complete wallet-level forecast.
+- Taker-side direction and outcome mapping should be
+  validated before making formal skill claims.
+- No final Forecasting Skill, BIA, or ML results yet.
+- Wallet skill features must only use outcomes
+  known before each feature timestamp.
+
+### 7. NEXT RESEARCH TASK
+
+BEGIN Part I-A: WHO IS ACTUALLY SMART MONEY?
+
+First research questions:
+1. How many wallets have enough independent
+   prediction opportunities for skill estimation?
+2. How does market-adjusted wallet performance vary?
+3. How much apparent performance can be explained
+   by luck and correlated predictions?
+4. Is performance persistent out of sample?
+5. Are there systematically wrong but informative
+   wallets (Predictable Fools)?
+
+Research priorities:
+- Statistical inference
+- Skill vs. luck
+- Wallet-level aggregation
+- Market/event dependence
+- Temporal out-of-sample validation
+- Behavioral Information Alpha as parallel dimension
+
+Start from descriptive diagnostics and wallet-level
+sample structure before choosing statistical models.
+
+DO NOT:
+- Re-download 569M trades.
+- Re-fetch 24K market probability histories.
+- Rebuild the 15-month probability alignment.
+- Reintroduce unnecessarily strict sample thresholds.
+- Confuse exploratory statistics with proven skill.
+- Start large ML pipelines before defining the target.
+
+### 8. DEVELOPMENT WORKFLOW
+
+Local environment:
+MacBook Air M1, 8GB RAM.
+VS Code is the authoritative code editing environment.
+GitHub is the authoritative version control repository.
+Colab Pro High-RAM executes heavier computations.
+Google Drive stores persistent Parquet and manifests.
+
+Repository:
+https://github.com/DINGMINZHAO/gambling-apocalypse-p1
+
+Local project:
+~/Desktop/gambling-p1
+
+Conda environment:
+gambling-p1
+
+Drive:
+MyDrive/gambling-apocalypse-p1/
+
+Workflow:
+Write scripts locally in VS Code.
+Git commit and push.
+Pull exact commit in Colab.
+Execute with progress output.
+Persist compact results to Drive.
+Update PROJECT_STATE.md at major milestones.
+
+Communication:
+Chinese with English technical terminology.
+Explain Web3 concepts clearly.
+Assume strong statistics and ML background.
+Be rigorous but practical: portfolio first.
+Move quickly toward meaningful empirical results.
+Discuss important research decisions step by step.
+
+END OF HANDOFF.
