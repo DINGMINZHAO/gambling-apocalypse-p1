@@ -59,7 +59,7 @@ def main():
                 category_refined, '__NULL__'
             )) AS category_versions,
             COUNT(DISTINCT COALESCE(
-                close_at, '__NULL__'
+                CAST(close_at AS VARCHAR), '__NULL__'
             )) AS close_versions
         FROM read_parquet(
             '{source}', union_by_name=true
