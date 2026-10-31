@@ -490,3 +490,55 @@ Move quickly toward meaningful empirical results.
 Discuss important research decisions step by step.
 
 END OF HANDOFF.
+
+
+---
+
+## Q2 CHECKPOINT — 2026-10-31 (after script 30)
+
+**This section supersedes older "next step / not yet analyzed" statements above.**
+Verified against the conversation's completed Colab logs. Scripts 19–30 are present on GitHub.
+The Google Drive Parquet outputs are persisted according to successful Colab \`[DONE]\` logs; remote file-level re-verification has not been performed here.
+
+### Research scope
+Part I-A has parallel Q1 Forecasting Skill and Q2 Behavioral Information Alpha (BIA). Wallet-level only, not identities. Part I-B/C and Part III remain separate.
+Q2 asks whether wallet actions and point-in-time historical characteristics improve YES/NO outcome probabilities beyond market probability. Prediction unit is **first qualifying taker BUY per wallet × market**.
+
+### Data — do not rebuild
+- Time window: 2025-01 to 2026-03.
+- Raw fills: 569,536,397; registry: 612,892 markets.
+- Official histories: 23,932 markets; 1,795,673 probability points.
+- 12h unified sample: 7,143,340 wallet × market × month rows; 6,728,149 distinct wallet × market first entries.
+- Data at \`MyDrive/gambling-apocalypse-p1/data/\`; preserve \`probability_alignment/\`, \`research_index/\`, \`research_results/\`.
+
+### Q1 completed (scripts 19–23)
+Wallet opportunity diagnostics, market-adjusted Skill, time-safe persistence, skill-vs-luck permutation, Empirical Bayes ranking.
+Highlights reported: winner's curse for sparse-history wallets; stronger persistence for experienced wallets; EB improves ranking; stable negative Forecasting Skill / Predictable Fools has NOT been established. Existing Q1 result files are in \`data/research_results/\`.
+
+### Q2 completed
+- \`24_bia_features.py\`: time-aware history and fixed-prior shrunk-skill proxy, 7-day outcome-availability proxy. Outputs:
+  \`data/research_results/p1a_bia_features_7d/\` with \`train.parquet\`, \`validation.parquet\`, \`final_test.parquet\`, and \`BIA_FEATURES_MANIFEST.json\`.
+  Counts: train **2,139,267**, validation **568,424**, final_test **1,973,839**.
+  Time splits by trade: train 2025 Jan–Sep, validation 2025 Oct–Dec, final test 2026 Jan–Mar. Excluded outcomes not available by appropriate split cutoff.
+- \`25_bia_models.py\`: M0 raw market, M1 calibrated market, M2 anonymous action, M3 wallet intelligence (logistic). Outputs \`p1a_bia_models_7d/\`.
+- \`26_bia_analysis.py\`: event-cluster bootstrap and heterogeneity; results under \`p1a_bia_models_7d/analysis/\`.
+- \`27_bia_ablation.py\`: Experience vs Skill incremental comparison; \`p1a_bia_ablation_7d/\`.
+- \`28_bia_lightgbm.py\`: nested L1 market, L2 action, L3 experience, L4 skill; trained models, predictions, figures under \`p1a_bia_lightgbm_7d/\`.
+  Final-test Brier improvements: L2 vs L1 +0.0005846; L3 vs L2 -0.0002974; L4 vs L3 +0.0001813; L4 vs L2 -0.0001160. Event-cluster uncertainty evaluated.
+- \`29_bia_freshness.py\`: existing-model prediction evaluation at 12h, 3h, 1h history-age caps, no refitting; \`p1a_bia_freshness_7d/\`.
+  L2 vs L1 final-test Brier improvement: 12h +0.0005846, 3h +0.0004381, 1h +0.0003286; evidence gets weaker with fresher price subsets and market composition changes. Historical price is a lagged proxy, not an exact executable pretrade quote.
+- \`30_bia_sequences.py\`: **COMPLETED successfully** in Colab CPU + High RAM, and writes to
+  \`data/research_results/p1a_bia_sequences_7d/\`.
+  Log: targets final_test 1,973,839 / train 2,139,267 / validation 568,424; processed >6 million wallet-market actions; final sequence-output counts exactly match all three target counts.
+  Deliverables: \`train.parquet\`, \`validation.parquet\`, \`final_test.parquet\`, \`SEQUENCE_MANIFEST.json\`.
+  Historical actions: up to 16 strictly earlier qualifying buys per wallet, with 5 sequence features: direction, log_trade_size, historical p_market_before, price_age_hours, log1p(days before current). No future settlement labels in sequence inputs. Use manifest \`history_ge_1\` / \`history_ge_5\` to inspect coverage; these counts have NOT yet been reported.
+
+### Next step after reconnect: script 31 DL experiments
+1. Verify Drive outputs and inspect \`SEQUENCE_MANIFEST.json\`, especially \`history_ge_1\` and \`history_ge_5\`. **Do not rerun script 30 unless files are missing or invalid**.
+2. Change Colab runtime to GPU for PyTorch training (L4 / T4 / G4 as available); mounting Drive and recloning/pulling GitHub are sufficient. Colab \`/content\` is ephemeral; Drive outputs persist.
+3. Train **S0 Static MLP**, **S1 History Pooling (order-insensitive)**, **S2 GRU (order-sensitive)** using identical splits/market-equal evaluation; compare to Logistic and LightGBM on the same sample; report Brier, Log Loss, event-cluster uncertainty and memory/sequence coverage. Keep one lightweight DL model rather than an unnecessarily heavy transformer until evidence warrants it.
+4. Use temporal safety and market/event dependence safeguards. Past actions may be unclosed, but their future outcomes may NOT enter sequence features. The final test was already inspected, so further comparisons are exploratory OOS, not untouched final confirmation.
+
+### Workflow
+Mac \`~/Desktop/gambling-p1\` VS Code is normal script editing place; repository \`DINGMINZHAO/gambling-apocalypse-p1\` is formal code version source; Colab Pro is compute; Drive holds permanent data.
+When resuming, synchronize local VS Code and Colab with GitHub HEAD; do not rely on old \`/content\` files. Continue with script 31, not any prior extraction/alignment step.
