@@ -215,3 +215,26 @@ history before further skill or BIA modeling.
 - Research-ready status: NOT YET.
 - Next: strict as-of matching to trade timestamps and
   benchmark-age/coverage validation.
+
+## Probability Acquisition Completed — 2026-10-31
+- Official historical price requests: 24,000.
+- Markets returning usable price history: 23,932.
+- Markets without qualifying points: 68.
+- Historical price points: 1,795,673.
+- Output: Drive/data/market_probabilities/.
+- Probability coverage is for prioritized candidates, not
+  the complete 612,892-market population.
+- Historical points use 3-hour aggregate buckets.
+- Pre-trade alignment and temporal quality remain unverified.
+
+## Probability Alignment
+- Script: scripts/17_probability_alignment.py
+- Scope: full 2025-01 through 2026-03 window.
+- First BUY per wallet-market-month for initial alignment.
+- Preserve original full trade database for later analysis.
+- Match latest completed historical probability bucket
+  strictly before each trade.
+- Evaluate 1h and 3h benchmark freshness.
+- Pre-close cutoff is provisional, not a verified
+  first-public-outcome timestamp.
+- No Forecasting Skill or BIA estimates yet.
