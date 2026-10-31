@@ -82,3 +82,35 @@ No final Forecasting Skill or BIA estimates yet.
 ### Next Step
 Prepare GitHub-to-Colab execution, then build the
 continuous historical research dataset.
+
+
+<!-- PILOT_COVERAGE_START -->
+## Pilot Market Coverage
+
+- Source: TimeSeventeen/Polymarket-v1, daily_aligned
+- Sample: six separate days in 2025 (not continuous)
+- Trade fills: 1,004,808
+- Unique markets (condition_id): 8,225
+- Unique wallets: 103,589
+- Markets with pre-close fills: 7,584
+- Resolved markets: 8,225
+- Markets appearing in 2+ sample days: 881
+- Markets appearing in 3+ sample days: 351
+- These are pilot coverage statistics, not the final
+  valid prediction sample or independent event count.
+
+## Next Development Stage
+
+Build continuous historical data for
+2025-01-01 through 2026-03-31.
+
+Primary candidate: TimeSeventeen/Polymarket-v1.
+Supplement: official historical market probabilities.
+
+Use Colab Pro for heavy processing and Google Drive
+for persistent datasets. All cloud runs must record
+the Git commit and data/run manifest.
+
+Do not begin final skill inference until pre-trade
+market probability and information cutoff are valid.
+<!-- PILOT_COVERAGE_END -->
