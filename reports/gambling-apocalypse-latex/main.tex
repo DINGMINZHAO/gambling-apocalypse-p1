@@ -1,0 +1,58 @@
+\documentclass[11pt,a4paper]{article}
+
+% Typography and page layout
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{newtxtext,newtxmath}
+\usepackage[a4paper,margin=25.5mm]{geometry}
+\usepackage{microtype}
+\usepackage{setspace}
+\setstretch{1.05}
+\usepackage{amsmath}
+\usepackage{booktabs,array,tabularx}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{needspace}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=black,citecolor=black,pdfauthor={Minzhao Ding},pdftitle={Gambling Apocalypse Part I: Who Is Actually Smart Money?}}
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false,skip=7pt}
+\setlength{\parindent}{1.3em}
+\setlength{\parskip}{0.10em}
+\setlength{\emergencystretch}{2em}
+\clubpenalty=10000
+\widowpenalty=10000
+
+% Use a real plot if present; otherwise show a clearly marked layout placeholder.
+% This makes the source compilable before figures are copied from Google Drive.
+\newcommand{\studyfigure}[4]{%
+  \begin{figure}[!htb]\centering
+  \IfFileExists{#1}{%
+     \includegraphics[width=0.94\linewidth,height=0.66\textheight,keepaspectratio]{#1}%
+  }{%
+     \fbox{\begin{minipage}[c][47mm][c]{0.88\linewidth}
+     \centering\small\textit{Layout placeholder: verified empirical figure pending}\\[5pt]
+     \texttt{\detokenize{#1}}\\[4pt] #2
+     \end{minipage}}%
+  }
+  \caption{#3}\label{#4}
+  \end{figure}
+}
+
+\title{\bfseries Gambling Apocalypse Part I:\\[3pt]Who Is Actually Smart Money?}
+\author{Minzhao Ding\\\small The University of Tokyo}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+\input{sections/00_abstract}
+\input{sections/01_data}
+\input{sections/02_skill}
+\input{sections/03_behavior}
+\input{sections/04_conviction}
+\input{sections/05_discussion}
+\input{sections/06_conclusion}
+\end{document}

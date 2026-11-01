@@ -1,0 +1,59 @@
+\section{Betting Conviction: Do Bigger Bets Know Better?}\label{sec:conviction}
+
+\subsection{When Wallets Suddenly Bet Bigger}
+
+Betting size is an important characteristic of trading behavior in prediction markets. A sudden increase in the amount committed to an outcome may reflect a change in how a wallet evaluates the corresponding event. To investigate this relationship, the current betting size of each wallet is compared with its own historical trading behavior. Trades are classified into three groups, namely Higher, Similar, and Lower Stake, according to whether the current stake is substantially above, close to, or below the wallet's historical level. This relative measure focuses on changes in individual trading behavior, allowing unusual betting activity to be identified among wallets with different typical transaction sizes.
+
+The first finding reveals an interesting pattern: wallets tend to increase their stakes on outcomes already strongly favored by the market. During January to March 2026, 64.1\% of trades in the Higher Stake group are associated with outcomes carrying market implied probabilities between 80\% and 100\%. The corresponding proportions are 26.7\% for the Similar Stake group and 10.0\% for the Lower Stake group. The results indicate that unusually large bets are frequently placed on outcomes that the market already considers highly likely to occur. This raises a further question concerning the information contained in larger bets. Are wallets making better predictions when they increase their stakes, or are they simply choosing outcomes with higher market probabilities?
+
+\studyfigure{figures/08_stake_probability.png}{Stake group probability distribution}{Composition of purchased outcome probabilities by relative stake group in Validation and Final Test, restricted to observations with at least five historical trades. The highlighted segments represent outcomes with market implied probabilities between 80\% and 100\%.}{fig:stake_probability}
+
+\subsection{Does Betting Bigger Predict Better?}
+
+To investigate whether larger bets correspond to superior forecasting performance, this study evaluates the difference between realized outcomes and their corresponding market implied probabilities using the forecasting advantage measure defined in Section~\ref{sec:eval}. Table~\ref{tab:stake} summarizes the forecasting performance of the three stake groups during the final evaluation period.
+
+\begin{table}[htbp]
+\centering
+\caption{Market adjusted forecasting performance across stake groups}\label{tab:stake}
+\begin{tabular}{lrrr}
+\toprule
+Stake Group & Implied Prob. & Win Rate & Advantage \\
+\midrule
+Lower & 28.51\% & 28.73\% & +0.22 pp \\
+Similar & 42.43\% & 42.98\% & +0.55 pp \\
+Higher & 66.34\% & 67.87\% & \textbf{+1.53 pp} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Higher Stake group achieves both a higher realized success rate and a greater forecasting advantage relative to market expectations. To further examine the relationship, Higher Stake and Similar Stake observations are compared within markets in which both groups are present. Each market receives equal weight, allowing forecasting performance to be compared under more similar market conditions.
+
+The results show that, during January to March 2026, the Higher Stake group achieves an additional forecasting advantage of approximately \textbf{1.09 percentage points} relative to the Similar Stake group. The corresponding 95\% confidence interval ranges from 0.48 to 1.67 percentage points. Interestingly, the overall difference is considerably smaller in the preceding evaluation period. This variation suggests that the relationship between betting size and forecasting performance may depend on the characteristics of the underlying markets. To investigate this possibility, the next analysis examines how the forecasting advantage associated with larger bets varies with market implied probabilities.
+
+\subsection{The Conviction Paradox}
+
+If unusually large bets contain additional predictive information, under what market conditions is this information most valuable? The previous analysis shows that wallets frequently increase their stakes on outcomes already favored by the market. However, markets with probabilities close to 50\% provide an interesting setting for investigating the informational value of betting behavior. In these markets, uncertainty remains relatively high, and individual forecasts may differ more substantially from prevailing market expectations. To explore this relationship, trades are divided into five groups according to the market implied probability of the selected outcome. The forecasting advantages of Higher Stake and Similar Stake observations are then compared within common markets and the same probability intervals. The results reveal a striking pattern, as summarized in Table~\ref{tab:prob_bins}.
+
+\begin{table}[htbp]
+\centering
+\caption{Additional forecasting advantage of Higher Stake relative to Similar Stake}\label{tab:prob_bins}
+\begin{tabular}{lrr}
+\toprule
+Market Probability & Validation & Final Test \\
+\midrule
+0--20\% & -0.10 pp & -0.10 pp \\
+20--40\% & +0.77 pp & +0.67 pp \\
+\textbf{40--60\%} & \textbf{+3.05 pp} & \textbf{+3.69 pp} \\
+60--80\% & +1.32 pp & +0.39 pp \\
+80--100\% & +0.10 pp & +0.05 pp \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The largest difference in forecasting advantage occurs when market probabilities lie between 40\% and 60\%. Within this interval, the Higher Stake group outperforms the Similar Stake group by 3.05 and 3.69 percentage points across the two evaluation periods. The corresponding 95\% Bootstrap confidence intervals range from 0.26 to 5.69 and from 2.15 to 5.28 percentage points, respectively. In contrast, when market implied probabilities are between 80\% and 100\%, the additional forecasting advantage associated with larger bets is close to zero in both periods.
+
+\studyfigure{figures/09_probability_bin.png}{Higher minus Similar, by probability bin}{Higher Stake minus Similar Stake forecasting advantage within common markets and purchased outcome probability bins. Points are market equal differences in percentage points; bars show event cluster Bootstrap 95\% confidence intervals.}{fig:prob_bin}
+
+These findings reveal an intriguing relationship between betting behavior and market uncertainty. \textbf{Wallets tend to increase their stakes most frequently on outcomes already favored by the market, whereas the additional forecasting advantage associated with larger bets is most pronounced when market outcomes remain uncertain.}
+
+One possible explanation concerns the information already incorporated into market prices. When market expectations remain uncertain, changes in individual betting behavior may reveal information that has not yet been fully reflected in prevailing probabilities. As market expectations become more concentrated, the scope for additional predictive information from individual trading decisions may diminish. This interpretation provides a further perspective on Smart Money identification. Historical forecasting performance reveals which wallets have demonstrated predictive ability, while changes in betting behavior may indicate when their decisions contain additional information. The relationship between trading behavior and market uncertainty therefore offers an interesting direction for identifying informative wallet activity in prediction markets.

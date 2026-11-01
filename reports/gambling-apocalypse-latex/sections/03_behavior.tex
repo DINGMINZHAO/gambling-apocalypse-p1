@@ -1,0 +1,54 @@
+\section{Behavioral Information Alpha: Does Wallet Behavior Add Predictive Information?}\label{sec:behavior}
+
+\subsection{Beyond Market Probabilities}
+
+The previous analysis establishes that historical forecasting performance contains information about future wallet performance. A further question is whether the trading behavior of individual wallets provides additional predictive information beyond market probabilities. Consider two wallets purchasing the same outcome in the same market. Although both face the same market probability, their trading sizes, historical experience, recent activity, and previous forecasting performance may differ considerably. These behavioral differences may reflect distinct information or decision processes and consequently contribute to forecasting accuracy.
+
+To examine this possibility, this study develops a series of predictive models with increasing amounts of information. The analysis begins with raw market probabilities, followed by probability calibration, anonymous trading features, and historical wallet characteristics. Logistic Regression and LightGBM are employed to evaluate the contribution of each information layer. Table~\ref{tab:logistic} summarizes the results obtained from Logistic Regression during the final evaluation period.
+
+\begin{table}[htbp]
+\centering
+\caption{Forecasting performance with additional behavioral information}\label{tab:logistic}
+\begin{tabular}{lr}
+\toprule
+Model & Brier Score \\
+\midrule
+Raw Market Probability & 0.129032 \\
+Market Calibration & 0.127967 \\
++ Anonymous Behavior & 0.127915 \\
++ Wallet History & \textbf{0.127858} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The results show that probability calibration improves forecasting accuracy relative to raw market probabilities. Incorporating anonymous trading behavior further reduces prediction errors, while historical wallet characteristics provide an additional improvement. This pattern indicates that wallet behavior contains predictive information beyond the probabilities already reflected in the market. The improvements are relatively small, suggesting that much of the available information is already incorporated into market prices.
+
+\studyfigure{figures/05_model_comparison.png}{Model Brier scores}{Market equal Brier Scores for the Logistic Regression model ladder (M0--M3) and the deep learning architectures (S0--S2). Scores are evaluated on the same 1,973,839 observations from Jan--Mar 2026; lower values indicate more accurate forecasts.}{fig:model}
+
+\subsection{Learning from Historical Trading Behavior}
+
+Beyond the information contained in the current transaction, historical trading behavior may reveal how individual wallets make decisions over time. Conventional feature engineering typically represents trading history through summary statistics, including the number of previous trades, average trading size, and historical forecasting performance. However, wallets with similar summary statistics may exhibit substantially different trading patterns. For example, one wallet may consistently place small bets of similar size, while another may trade infrequently before occasionally making much larger bets. Such differences may contain useful information about trading behavior that is not fully captured by simple historical averages.
+
+To investigate this possibility, this study constructs a sequence of up to 16 historical trades for each qualifying observation. The sequence contains information about the selected outcome, trade size, market probability, the age of historical price observations, and the time elapsed between trades. Three neural network structures are developed to evaluate different representations of historical behavior. The Static MLP uses current trading information and static wallet characteristics. Mean Pooling combines historical trading events into a representation of overall trading behavior. GRU further incorporates the temporal ordering of historical events.
+
+The results show that Mean Pooling achieves a Brier Score of 0.127890 during the final evaluation period, outperforming both the Static MLP, with a score of 0.128425, and GRU, with a score of 0.128600. These results suggest that a relatively simple representation of historical trading activity can capture useful predictive information. In this application, the additional complexity of GRU does not improve forecasting performance over Mean Pooling, indicating that the overall characteristics of historical behavior may be more informative than their precise temporal ordering.
+
+\subsection{Is Historical Information Really Useful?}
+
+The improvement achieved by historical behavior models raises a further question concerning the source of their predictive advantage. In particular, it is important to distinguish the contribution of historical trading information from improvements arising from differences in model architecture. To address this question, this study first conducts History Ablation and History Shuffle experiments. These experiments examine changes in forecasting performance when historical information is removed or when the content of historical trading sequences is randomized. The results indicate that historical trading sequences contain useful predictive information. Among wallets with available trading histories, models using the original historical content generally achieve better forecasting performance than those using randomized histories.
+
+A further controlled experiment is developed to identify the contribution of historical event information more directly. Two models with identical network structures are compared. The first model, C0, retains historical trading counts and static wallet characteristics but excludes the detailed content of historical events. The second model, C1, incorporates the original historical trading events using the same architecture. Across three different random seeds, C1 consistently achieves a lower Brier Score than C0. The ensemble results further show that the Brier Score decreases from 0.127466 to 0.127282 when the original historical information is included, representing an improvement of approximately 0.000184. The corresponding 95\% Bootstrap confidence interval ranges from $-0.000057$ to $0.000391$. The positive improvement provides encouraging evidence of historical information value, although its statistical reliability requires further investigation.
+
+\studyfigure{figures/06_controlled_history.png}{Same architecture C0 and C1 Brier gains}{Incremental market equal Brier improvement from real historical event content (C1) compared with the same architecture without event content (C0). Event cluster Bootstrap 95\% confidence intervals are shown for both evaluation periods.}{fig:history_control}
+
+These experiments provide further insight into the information contained in historical wallet behavior. In particular, the controlled comparison indicates that the content of previous transactions may contribute to forecasting performance beyond the information already captured by trading frequency and static wallet characteristics.
+
+\subsection{When Does Historical Behavior Matter More?}
+
+The predictive contribution of historical trading information may also depend on the circumstances surrounding a wallet's current decision. To examine this relationship, observations are grouped according to the recency of historical trades, changes in betting size, changes in the probability of the selected outcome, and trading direction. The improvement associated with historical information is then evaluated across different behavioral conditions. The results reveal noticeable differences in predictive improvement across these groups.
+
+Among observations with at least five historical trades, incorporating the original historical information reduces the Brier Score by approximately 0.000239 for wallets that have traded within the previous seven days. The corresponding improvement reaches approximately 0.000373 for observations classified as Higher Stake. These findings suggest that historical trading information may be particularly useful when wallets have been active recently or exhibit substantial changes in betting size.
+
+Further comparisons within common markets show that some differences between behavioral groups become smaller after accounting for market characteristics. This motivates a more direct investigation of the relationship between betting behavior and actual forecasting performance. In particular, when a wallet suddenly increases its betting size, does this change correspond to a greater forecasting advantage relative to market expectations?
+
+\studyfigure{figures/07_behavioral_heterogeneity.png}{Recency, stake change and historical gain}{Incremental C1 versus C0 Brier improvement by historical trade recency and relative stake size, among observations with at least five historical trades. Error bars show event cluster Bootstrap 95\% confidence intervals.}{fig:heterogeneity}

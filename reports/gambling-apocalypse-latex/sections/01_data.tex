@@ -1,0 +1,41 @@
+\section{Data and Research Design}\label{sec:data}
+
+\subsection{Prediction Markets and Wallet Behavior}
+
+Polymarket is a blockchain based prediction market where participants trade contracts on the outcomes of future events. A typical market offers YES and NO contracts. For instance, in a market concerning whether a candidate will win an election, the price of a YES contract can be interpreted as the market's estimated probability of that outcome. Once the event is resolved, the contract corresponding to the correct outcome pays 1, while the alternative pays 0. Prediction markets aggregate the expectations of participants with different information, experience, and forecasting abilities. The resulting market probabilities provide a benchmark for evaluating individual forecasts. At the same time, differences in trading behavior may reveal information that has not been fully incorporated into market prices.
+
+Blockchain transaction records provide an opportunity to examine these relationships at the wallet level. By tracing wallet addresses, it is possible to observe how the same wallet participates in different markets over time. This study constructs wallet level features that describe historical forecasting performance, trading activity, betting size, and changes in trading behavior, allowing their predictive value to be investigated systematically.
+
+\subsection{Dataset Construction}
+
+The dataset covers Polymarket transactions from January 2025 to March 2026, comprising 569.54 million trade records. The original market registry contains 612,892 markets. By incorporating official historical market prices, identifying realized outcomes, and aligning market information with transaction timestamps, this study constructs a research dataset containing 14,925 markets and 1,169,132 wallets. The initial processing produces approximately 7.14 million observations indexed by wallet, market, and month. For predictive modeling, the first qualifying taker BUY made by each wallet in each market is selected. Historical features are then constructed using trading information available before the corresponding transaction. The resulting dataset for Behavioral Information Alpha contains 4,681,530 observations. The sample is divided into three chronological periods, as summarized in Table~\ref{tab:splits}.
+
+\begin{table}[htbp]
+\centering
+\caption{Temporal division of the research dataset}\label{tab:splits}
+\begin{tabular}{lll}
+\toprule
+Dataset & Period & Observations \\
+\midrule
+Training & Jan 2025 to Sep 2025 & 2,139,267 \\
+Validation & Oct 2025 to Dec 2025 & 568,424 \\
+Final Test & Jan 2026 to Mar 2026 & 1,973,839 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This chronological division allows models to be developed using earlier observations and evaluated against subsequent market outcomes. It also provides a consistent basis for examining whether forecasting signals remain informative across different periods.
+
+\subsection{Market Benchmark and Evaluation}\label{sec:eval}
+
+Historical market implied probabilities are used as the primary forecasting benchmark. These probabilities are obtained from completed three hour price intervals provided by Polymarket and aligned with individual transactions according to their timestamps. The main sample uses probability observations available within 12 hours before each trade. Two evaluation approaches are adopted to examine forecasting skills and behavioral information.
+
+First, forecasting skill is evaluated by comparing the realized outcome of a wallet's prediction with the probability implied by the market before the transaction. The forecasting advantage of an individual trade is defined as
+\begin{equation}\label{eq:advantage}
+A = Z-q,
+\end{equation}
+where $Z$ equals 1 if the outcome purchased by the wallet occurs and 0 otherwise, while $q$ denotes the market implied probability of that outcome.
+
+For example, suppose a wallet purchases an outcome with an implied probability of 40\%, and the outcome eventually occurs. The forecasting advantage of this observation is $1-0.4=0.6$. Aggregating these observations across markets provides a measure of wallet forecasting performance relative to market expectations.
+
+Second, Behavioral Information Alpha is evaluated through probability forecasting. The Brier Score and Log Loss are employed to measure the difference between predicted probabilities and realized outcomes. A lower score indicates more accurate forecasts. Comparing models with different sets of behavioral features allows the incremental predictive contribution of trading information to be assessed. Each market receives equal weight during model evaluation, preventing markets with a larger number of wallet observations from dominating the results. Statistical uncertainty is estimated using Bootstrap resampling clustered at the event level.
